@@ -13,19 +13,14 @@
     color: #1a1a1a;
     min-height: 100vh;
     padding: 1.5rem 1rem 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  h1 {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
-    margin-bottom: 0.25rem;
-  }
-
-  .subtitle {
-    font-size: 13px;
-    color: #666;
-    margin-bottom: 1.25rem;
+  .inner {
+    width: 100%;
+    max-width: 780px;
   }
 
   .stats-bar {
@@ -47,8 +42,8 @@
     background: #fff;
     border: 0.5px solid #d0cfc9;
     border-radius: 8px;
-    padding: 5px 12px;
-    font-size: 13px;
+    padding: 6px 14px;
+    font-size: 16px;
     color: #555;
   }
 
@@ -61,8 +56,8 @@
     background: #fff;
     border: 0.5px solid #d0cfc9;
     border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 13px;
+    padding: 7px 16px;
+    font-size: 16px;
     cursor: pointer;
     color: #333;
     font-family: inherit;
@@ -74,7 +69,7 @@
   .legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 1.25rem;
   }
 
@@ -82,18 +77,16 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 14px;
     color: #555;
   }
 
   .legend-swatch {
-    width: 18px;
-    height: 22px;
+    width: 20px;
+    height: 26px;
     border-radius: 4px;
     border: 1.5px solid rgba(0,0,0,0.15);
   }
-
-  .grid-container { }
 
   .row-wrap {
     display: flex;
@@ -103,12 +96,12 @@
   }
 
   .row-label {
-    font-size: 11px;
+    font-size: 13px;
     color: #999;
-    min-width: 26px;
+    min-width: 30px;
     text-align: right;
     padding-right: 4px;
-    padding-top: 6px;
+    padding-top: 8px;
     flex-shrink: 0;
   }
 
@@ -119,8 +112,8 @@
   }
 
   .card-btn {
-    width: 46px;
-    height: 58px;
+    width: 55px;
+    height: 70px;
     border-radius: 6px;
     border: 1.5px solid transparent;
     cursor: pointer;
@@ -138,83 +131,62 @@
   .card-btn:active { transform: scale(0.95); }
 
   .card-num {
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 600;
     line-height: 1;
   }
 
   .card-bull {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1;
     font-weight: 500;
   }
 
-  /* Unplayed states by bull value */
-  .b1 {
-    background: #fff;
-    border-color: #ccc;
-    color: #222;
-  }
+  .b1 { background: #fff; border-color: #ccc; color: #222; }
   .b1 .card-bull { color: #999; }
 
-  .b2 {
-    background: #dbeafe;
-    border-color: #93c5fd;
-    color: #1e3a5f;
-  }
+  .b2 { background: #dbeafe; border-color: #93c5fd; color: #1e3a5f; }
   .b2 .card-bull { color: #3b82f6; }
 
-  .b3 {
-    background: #dcfce7;
-    border-color: #86efac;
-    color: #14532d;
-  }
+  .b3 { background: #dcfce7; border-color: #86efac; color: #14532d; }
   .b3 .card-bull { color: #16a34a; }
 
-  .b5 {
-    background: #fee2e2;
-    border-color: #fca5a5;
-    color: #7f1d1d;
-  }
+  .b5 { background: #fee2e2; border-color: #fca5a5; color: #7f1d1d; }
   .b5 .card-bull { color: #ef4444; }
 
-  .b7 {
-    background: #ffedd5;
-    border-color: #fdba74;
-    color: #7c2d12;
-  }
+  .b7 { background: #ffedd5; border-color: #fdba74; color: #7c2d12; }
   .b7 .card-bull { color: #f97316; }
 
-  /* Played state — same for all */
-  .card-btn.played {
-    opacity: 0.28;
-  }
+  /* Card 55 — screaming orange */
+  #c55 { background: #ff5500; border-color: #cc3300; color: #fff; box-shadow: 0 0 0 2px #ff5500; }
+  #c55 .card-bull { color: #ffe0cc; }
+
+  .card-btn.played { opacity: 0.25; }
 </style>
 </head>
 <body>
+<div class="inner">
 
-<h1>6 Nimmt! Card Tracker</h1>
-<p class="subtitle">Click a card to mark it played.</p>
-
-<div class="legend">
-  <div class="legend-item"><div class="legend-swatch" style="background:#fff; border-color:#ccc;"></div> 1 bull</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#dbeafe; border-color:#93c5fd;"></div> 2 bulls</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#dcfce7; border-color:#86efac;"></div> 3 bulls</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#fee2e2; border-color:#fca5a5;"></div> 5 bulls</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#ffedd5; border-color:#fdba74;"></div> 7 bulls (55)</div>
-</div>
-
-<div class="stats-bar">
-  <div class="stats-pills">
-    <div class="stat-pill">Played: <span id="played-count">0</span> / 104</div>
-    <div class="stat-pill">Remaining: <span id="remaining-count">104</span></div>
-    <div class="stat-pill">Bulls taken: <span id="bulls-count">0</span></div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background:#fff; border-color:#ccc;"></div> 1 bull</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#dbeafe; border-color:#93c5fd;"></div> 2 bulls</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#dcfce7; border-color:#86efac;"></div> 3 bulls</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#fee2e2; border-color:#fca5a5;"></div> 5 bulls</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#ff5500; border-color:#cc3300;"></div> 7 bulls (55)</div>
   </div>
-  <button class="reset-btn" onclick="resetAll()">↺ Reset</button>
+
+  <div class="stats-bar">
+    <div class="stats-pills">
+      <div class="stat-pill">Played: <span id="played-count">0</span> / 104</div>
+      <div class="stat-pill">Remaining: <span id="remaining-count">104</span></div>
+      <div class="stat-pill">Bulls taken: <span id="bulls-count">0</span></div>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">↺ Reset</button>
+  </div>
+
+  <div id="grid"></div>
+
 </div>
-
-<div class="grid-container" id="grid"></div>
-
 <script>
 const BULL_OVERRIDES = {
   55: 7,
@@ -291,7 +263,6 @@ for (let row = 0; row < 8; row++) {
 
     const bullEl = document.createElement('span');
     bullEl.className = 'card-bull';
-    bullEl.textContent = b + (b === 1 ? ' ♦' : ' ♦♦'.slice(0, b > 1 ? 4 : 2));
     bullEl.textContent = b + '♦';
 
     btn.appendChild(numEl);
