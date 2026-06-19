@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6 Nimmt! Card Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f5f4f0;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 0.25rem;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 1.25rem;
+  }
+
+  .stats-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .stats-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .stat-pill {
+    background: #fff;
+    border: 0.5px solid #d0cfc9;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 13px;
+    color: #555;
+  }
+
+  .stat-pill span {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .reset-btn {
+    background: #fff;
+    border: 0.5px solid #d0cfc9;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #333;
+    font-family: inherit;
+    transition: background 0.1s;
+  }
+
+  .reset-btn:hover { background: #eeecea; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #555;
+  }
+
+  .legend-swatch {
+    width: 18px;
+    height: 22px;
+    border-radius: 4px;
+    border: 1.5px solid rgba(0,0,0,0.15);
+  }
+
+  .grid-container { }
+
+  .row-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: 5px;
+  }
+
+  .row-label {
+    font-size: 11px;
+    color: #999;
+    min-width: 26px;
+    text-align: right;
+    padding-right: 4px;
+    padding-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .cards-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .card-btn {
+    width: 46px;
+    height: 58px;
+    border-radius: 6px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: opacity 0.1s, transform 0.08s;
+    position: relative;
+    user-select: none;
+  }
+
+  .card-btn:active { transform: scale(0.95); }
+
+  .card-num {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .card-bull {
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 500;
+  }
+
+  /* Unplayed states by bull value */
+  .b1 {
+    background: #fff;
+    border-color: #ccc;
+    color: #222;
+  }
+  .b1 .card-bull { color: #999; }
+
+  .b2 {
+    background: #dbeafe;
+    border-color: #93c5fd;
+    color: #1e3a5f;
+  }
+  .b2 .card-bull { color: #3b82f6; }
+
+  .b3 {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #14532d;
+  }
+  .b3 .card-bull { color: #16a34a; }
+
+  .b5 {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #7f1d1d;
+  }
+  .b5 .card-bull { color: #ef4444; }
+
+  .b7 {
+    background: #ffedd5;
+    border-color: #fdba74;
+    color: #7c2d12;
+  }
+  .b7 .card-bull { color: #f97316; }
+
+  /* Played state — same for all */
+  .card-btn.played {
+    opacity: 0.28;
+  }
+</style>
+</head>
+<body>
+
+<h1>6 Nimmt! Card Tracker</h1>
+<p class="subtitle">Click a card to mark it played.</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#fff; border-color:#ccc;"></div> 1 bull</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#dbeafe; border-color:#93c5fd;"></div> 2 bulls</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#dcfce7; border-color:#86efac;"></div> 3 bulls</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#fee2e2; border-color:#fca5a5;"></div> 5 bulls</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#ffedd5; border-color:#fdba74;"></div> 7 bulls (55)</div>
+</div>
+
+<div class="stats-bar">
+  <div class="stats-pills">
+    <div class="stat-pill">Played: <span id="played-count">0</span> / 104</div>
+    <div class="stat-pill">Remaining: <span id="remaining-count">104</span></div>
+    <div class="stat-pill">Bulls taken: <span id="bulls-count">0</span></div>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset</button>
+</div>
+
+<div class="grid-container" id="grid"></div>
+
+<script>
+const BULL_OVERRIDES = {
+  55: 7,
+  11: 5, 22: 5, 33: 5, 44: 5, 66: 5, 77: 5, 88: 5, 99: 5,
+  10: 3, 20: 3, 30: 3, 40: 3, 50: 3, 60: 3, 70: 3, 80: 3, 90: 3, 100: 3
+};
+
+function bulls(n) {
+  if (BULL_OVERRIDES[n]) return BULL_OVERRIDES[n];
+  if (n % 10 === 5) return 2;
+  return 1;
+}
+
+const played = new Set();
+const cardBulls = {};
+
+function updateStats() {
+  let totalBulls = 0;
+  played.forEach(n => { totalBulls += cardBulls[n]; });
+  document.getElementById('played-count').textContent = played.size;
+  document.getElementById('remaining-count').textContent = 104 - played.size;
+  document.getElementById('bulls-count').textContent = totalBulls;
+}
+
+function toggle(n) {
+  const btn = document.getElementById('c' + n);
+  if (played.has(n)) {
+    played.delete(n);
+    btn.classList.remove('played');
+  } else {
+    played.add(n);
+    btn.classList.add('played');
+  }
+  updateStats();
+}
+
+function resetAll() {
+  played.clear();
+  document.querySelectorAll('.card-btn.played').forEach(b => b.classList.remove('played'));
+  updateStats();
+}
+
+const container = document.getElementById('grid');
+const ROW_SIZE = 13;
+
+for (let row = 0; row < 8; row++) {
+  const start = row * ROW_SIZE + 1;
+  const end = Math.min(start + ROW_SIZE - 1, 104);
+
+  const rowDiv = document.createElement('div');
+  rowDiv.className = 'row-wrap';
+
+  const label = document.createElement('div');
+  label.className = 'row-label';
+  label.textContent = start;
+  rowDiv.appendChild(label);
+
+  const flex = document.createElement('div');
+  flex.className = 'cards-flex';
+
+  for (let n = start; n <= end; n++) {
+    const b = bulls(n);
+    cardBulls[n] = b;
+
+    const btn = document.createElement('button');
+    btn.className = 'card-btn b' + b;
+    btn.id = 'c' + n;
+    btn.title = 'Card ' + n + ' — ' + b + ' bull' + (b > 1 ? 's' : '');
+    btn.onclick = () => toggle(n);
+
+    const numEl = document.createElement('span');
+    numEl.className = 'card-num';
+    numEl.textContent = n;
+
+    const bullEl = document.createElement('span');
+    bullEl.className = 'card-bull';
+    bullEl.textContent = b + (b === 1 ? ' ♦' : ' ♦♦'.slice(0, b > 1 ? 4 : 2));
+    bullEl.textContent = b + '♦';
+
+    btn.appendChild(numEl);
+    btn.appendChild(bullEl);
+    flex.appendChild(btn);
+  }
+
+  rowDiv.appendChild(flex);
+  container.appendChild(rowDiv);
+}
+</script>
+</body>
+</html>
