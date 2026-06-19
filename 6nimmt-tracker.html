@@ -42,6 +42,7 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    align-items: center;
   }
 
   .stat-pill {
@@ -50,6 +51,8 @@
     border-radius: 8px;
     padding: 6px 14px;
     font-size: 22px;
+    color: #555;
+    font-family: "IBM Plex Sans", sans-serif;
   }
 
   .stat-pill span {
@@ -57,7 +60,14 @@
     color: #1a1a1a;
   }
 
-  .reset-btn {
+  .phase-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #b8860b;
+    padding: 6px 4px;
+  }
+
+  .action-btn {
     background: #fff;
     border: 0.5px solid #d0cfc9;
     border-radius: 8px;
@@ -66,9 +76,24 @@
     color: #333;
     font-family: "IBM Plex Sans", sans-serif;
     transition: background 0.1s;
+    cursor: pointer;
   }
+  .action-btn:hover { background: #eeecea; }
 
-  .reset-btn:hover { background: #eeecea; }
+  .start-btn {
+    background: #b8860b;
+    border: 1.5px solid #8b6508;
+    color: #fff;
+    border-radius: 8px;
+    padding: 7px 20px;
+    font-size: 22px;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .start-btn:hover { background: #9a7009; }
+  .start-btn:disabled { opacity: 0.4; cursor: default; }
 
   .row-wrap {
     display: flex;
@@ -114,6 +139,7 @@
     font-weight: 500;
   }
 
+  /* Bull-count colours */
   .b1 { background: #fff; border-color: #ccc; color: #222; }
   .b1 .card-bull { color: #999; }
 
@@ -132,6 +158,16 @@
   #c55 { background: #ff5500; border-color: #cc3300; color: #fff; box-shadow: 0 0 0 2px #ff5500; }
   #c55 .card-bull { color: #ffe0cc; }
 
+  /* My hand — gold */
+  .card-btn.in-hand {
+    background: #ffd700 !important;
+    border-color: #b8860b !important;
+    color: #3b2a00 !important;
+    box-shadow: 0 0 0 2px #ffd700;
+  }
+  .card-btn.in-hand .card-bull { color: #7a5c00 !important; }
+
+  /* Played */
   .card-btn.played { opacity: 0.1; }
 </style>
 </head>
@@ -139,10 +175,8 @@
 <div class="inner">
 
   <div class="stats-bar">
-    <div class="stats-pills">
-      <div class="stat-pill">Played: <span id="played-count">0</span> / 64</div>
-      <div class="stat-pill">Remaining: <span id="remaining-count">64</span></div>
-      <button class="reset-btn" onclick="resetAll()">↺ Reset</button>
+    <div class="stats-pills" id="pills">
+      <!-- filled by JS -->
     </div>
   </div>
 
@@ -162,32 +196,76 @@ function bulls(n) {
   return 1;
 }
 
+// Phases: 'setup' | 'round'
+let phase = 'setup';
+const myHand = new Set();
 const played = new Set();
 const cardBulls = {};
 
 function updateStats() {
-  document.getElementById('played-count').textContent = played.size;
-  document.getElementById('remaining-count').textContent = 64 - played.size;
+  const pills = document.getElementById('pills');
+  if (phase === 'setup') {
+    pills.innerHTML = `
+      <span class="phase-label">Select your 10 cards&nbsp;(<span id="hand-count">${myHand.size}</span>/10)</span>
+      <button class="start-btn" id="start-btn" onclick="startRound()" ${myHand.size === 10 ? '' : 'disabled'}>Start round</button>
+      <button class="action-btn" onclick="resetAll()">↺ Reset</button>
+    `;
+  } else {
+    pills.innerHTML = `
+      <div class="stat-pill">Played: <span>${played.size}</span> / 64</div>
+      <div class="stat-pill">Remaining: <span>${64 - played.size}</span></div>
+      <button class="action-btn" onclick="resetAll()">↺ Reset</button>
+    `;
+  }
+}
+
+function startRound() {
+  if (myHand.size !== 10) return;
+  phase = 'round';
+  updateStats();
+}
+
+function resetAll() {
+  phase = 'setup';
+  myHand.clear();
+  played.clear();
+  document.querySelectorAll('.card-btn').forEach(b => {
+    b.classList.remove('played', 'in-hand');
+  });
+  updateStats();
 }
 
 function toggle(n) {
   const btn = document.getElementById('c' + n);
+
+  if (phase === 'setup') {
+    if (myHand.has(n)) {
+      myHand.delete(n);
+      btn.classList.remove('in-hand');
+    } else {
+      if (myHand.size >= 10) return;
+      myHand.add(n);
+      btn.classList.add('in-hand');
+    }
+    updateStats();
+    return;
+  }
+
+  // Round phase
   if (played.has(n)) {
     played.delete(n);
     btn.classList.remove('played');
+    // restore hand highlight if it was in hand
+    if (myHand.has(n)) btn.classList.add('in-hand');
   } else {
     played.add(n);
+    btn.classList.remove('in-hand');
     btn.classList.add('played');
   }
   updateStats();
 }
 
-function resetAll() {
-  played.clear();
-  document.querySelectorAll('.card-btn.played').forEach(b => b.classList.remove('played'));
-  updateStats();
-}
-
+// Build grid
 const container = document.getElementById('grid');
 const ROW_SIZE = 13;
 
@@ -227,6 +305,8 @@ for (let row = 0; row < 8; row++) {
   rowDiv.appendChild(flex);
   container.appendChild(rowDiv);
 }
+
+updateStats();
 </script>
 </body>
 </html>
